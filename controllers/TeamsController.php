@@ -39,7 +39,7 @@ class TeamsController extends Controller
         $model = new CreateTeam();
 
         if ($model->load(Yii::$app->request->post()) && $model->create()) {
-            $result = 'Ссылка добавлена: ' . Url::to(['parse', 'id' => $model->getEntity()->id], true);
+            $result = 'Ссылка добавлена: ' . Url::to(['view', 'id' => $model->getEntity()->id], true);
             Yii::$app->session->addFlash('success', $result);
         }
 
