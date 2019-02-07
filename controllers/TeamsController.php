@@ -2,9 +2,12 @@
 
 namespace app\controllers;
 
+use app\entities\Players;
+use app\models\CreateTeam;
 use app\models\Parser;
 use Yii;
 use app\entities\Teams;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -33,10 +36,10 @@ class TeamsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Teams();
+        $model = new CreateTeam();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $result = 'Ссылка добавлена: ' . Url::to(['parse', 'id' => $model->id], true);
+        if ($model->load(Yii::$app->request->post()) && $model->create()) {
+            $result = 'Ссылка добавлена: ' . Url::to(['parse', 'id' => $model->getEntity()->id], true);
             Yii::$app->session->addFlash('success', $result);
         }
 
@@ -48,14 +51,32 @@ class TeamsController extends Controller
     /**
      * Получает информацию
      * @param $id
-     * @return \app\src\Overview
+     * @return array
      * @throws NotFoundHttpException
      */
-    public function actionParse($id)
+    public function actionView($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = $this->findModel($id);
-        return Parser::parse($model);
+        return ArrayHelper::toArray($model, [
+            Teams::class => [
+                'maps_played',
+                'wins_draws_losses',
+                'total_kills',
+                'total_deaths',
+                'rounds_played',
+                'kd_ratio',
+                'players' => function (Teams $team) {
+                    return ArrayHelper::toArray($team->players, [
+                        Players::class => [
+                            'player',
+                            'kd_diff',
+                            'kd'
+                        ]
+                    ]);
+                },
+            ],
+        ]);
     }
 
     /**

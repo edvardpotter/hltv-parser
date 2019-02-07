@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\entities\Teams */
+/* @var $model \app\models\CreateTeam */
 
 $this->title = Yii::t('app', 'Добавить ссылку');
 $this->params['breadcrumbs'][] = $this->title;
